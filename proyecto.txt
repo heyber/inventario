@@ -1,0 +1,264 @@
+# 🚀 Proyecto Next.js + Prisma + PostgreSQL (Docker)
+
+Este proyecto es una aplicación construida con **Next.js**, usando **Prisma ORM** y **PostgreSQL** dentro de **Docker** para desarrollo local.
+
+---
+
+## 📦 Tecnologías
+
+* Next.js (App Router)
+* Prisma ORM
+* PostgreSQL
+* Docker & Docker Compose
+* TypeScript
+
+---
+
+## ⚙️ Requisitos
+
+* Node.js 18+
+* Docker y Docker Compose
+
+---
+
+## 🧑‍💻 Configuración del proyecto
+
+### 1. Clonar el repositorio
+
+```bash
+git clone <repo-url>
+cd <project-folder>
+```
+
+---
+
+### 2. Variables de entorno
+
+Crea un archivo `.env` en la raíz:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb"
+```
+
+---
+
+### 3. Levantar la base de datos con Docker
+
+```bash
+docker-compose up -d
+```
+
+Esto levantará:
+
+* PostgreSQL en `localhost:5432`
+
+---
+
+### 4. Ejecutar migraciones
+
+```bash
+npx prisma migrate dev --name init
+```
+
+---
+
+### 5. Ejecutar el proyecto
+
+```bash
+npm run dev
+```
+
+Abrir en navegador:
+
+```
+http://localhost:3000
+```
+
+---
+
+### 6. Abrir Prisma Studio
+
+```bash
+npx prisma studio
+```
+
+Abrir en:
+
+```
+http://localhost:5555
+```
+
+---
+
+## 🧪 Poblar la base de datos
+
+Puedes hacerlo de dos formas:
+
+### Opción 1: Prisma Studio
+
+* Ir a tabla `User`
+* Crear usuario
+* Ir a tabla `Product`
+* Crear producto asociado
+
+---
+
+### Opción 2: Seed script (opcional)
+
+Crear archivo:
+
+```
+prisma/seed.ts
+```
+
+Y ejecutar:
+
+```bash
+npx ts-node prisma/seed.ts
+```
+
+---
+
+## 🐳 Docker
+
+### Servicios definidos
+
+* **db** → PostgreSQL
+* **app** → Next.js + Prisma
+
+### Notas importantes
+
+* Dentro de Docker, la DB se accede con `db`
+* Fuera de Docker, se accede con `localhost`
+
+---
+
+## ⚠️ Problemas comunes
+
+### ❌ Error: Can't reach database server
+
+* Verificar que Docker esté corriendo
+* Revisar `DATABASE_URL`
+
+---
+
+### ❌ Error: Environment variable not found
+
+* Asegurarse de que existe `.env`
+* Eliminar `prisma.config.ts` si existe
+
+---
+
+### ❌ Error: Table does not exist
+
+```bash
+npx prisma migrate dev
+```
+
+---
+
+## 🧠 CONTEXTO DEL PROYECTO (PARA IA)
+
+Este proyecto es una aplicación fullstack en desarrollo con las siguientes características:
+
+### Arquitectura
+
+* Frontend: Next.js (App Router)
+* Backend: API routes de Next.js
+* ORM: Prisma
+* Base de datos: PostgreSQL en Docker
+
+---
+
+### Modelos principales
+
+#### User
+
+* id
+* email
+* password
+* relación con productos
+
+#### Product
+
+* id
+* name
+* description
+* price
+* stock
+* userId (relación con User)
+
+---
+
+### Relación de datos
+
+* Un **User** puede tener muchos **Product**
+* Un **Product** pertenece a un **User**
+
+---
+
+### Flujo de desarrollo
+
+1. Levantar Docker (DB)
+2. Ejecutar migraciones Prisma
+3. Levantar Next.js
+4. Usar Prisma Studio para validar datos
+5. Consumir datos desde API o frontend
+
+---
+
+### Convenciones importantes
+
+* `DATABASE_URL` cambia según entorno:
+
+  * Local → `localhost`
+  * Docker → `db`
+
+* Prisma requiere migraciones para crear tablas
+
+---
+
+### Estado actual del proyecto
+
+* Prisma configurado correctamente
+* Base de datos funcionando en Docker
+* Migraciones aplicadas
+* Prisma Studio operativo
+* CRUD listo para implementar
+
+---
+
+### Objetivo del proyecto
+
+Servir como base para:
+
+* Sistema de productos
+* Backend escalable con Prisma
+* Integración con frontend moderno
+
+---
+
+### Instrucciones para IA
+
+Cuando trabajes sobre este proyecto:
+
+* Asume que Prisma ya está configurado
+* Usa los modelos `User` y `Product`
+* Respeta relaciones entre entidades
+* No modificar configuración de Docker sin necesidad
+* Priorizar buenas prácticas (services, repositorios, etc.)
+
+---
+
+## 🚀 Próximos pasos
+
+* Crear endpoints `/api/products`
+* Implementar autenticación
+* Conectar frontend con backend
+* Deploy
+
+---
+
+## 📄 Licencia
+
+Uso libre para aprendizaje y desarrollo.
