@@ -1,175 +1,96 @@
-# 🚀 Gserucó App
+HESERUCI App
 
-Proyecto base para desarrollo de aplicaciones web usando **Next.js + Prisma + PostgreSQL + Docker**.
+Plantilla base para el desarrollo de aplicaciones web utilizando Next.js, Prisma, PostgreSQL y Docker.
+Este repositorio está diseñado como punto de partida reutilizable para nuevos proyectos.
 
-Este repositorio funciona como **plantilla inicial** para futuros proyectos.
+Stack Tecnológico
+Next.js (App Router)
+React
+Tailwind CSS
+Prisma ORM
+PostgreSQL
+Docker y Docker Compose
+Arquitectura
 
----
+El proyecto se organiza en los siguientes módulos:
 
-## 🧱 Stack Tecnológico
+/app: Capa de frontend (interfaces y páginas)
+/app/api: Endpoints del backend (API routes)
+/prisma: Esquema y configuración de base de datos
+docker-compose.yml: Definición de servicios y orquestación
+Entorno con Docker
 
-* **Next.js (App Router)**
-* **React**
-* **Tailwind CSS**
-* **Prisma ORM**
-* **PostgreSQL**
-* **Docker & Docker Compose**
+La aplicación se ejecuta mediante dos servicios principales:
 
----
-
-## ⚙️ Arquitectura
-
-El proyecto está dividido en:
-
-* `/app` → Frontend (páginas y UI)
-* `/app/api` → Backend (API routes)
-* `prisma/` → Esquema y configuración de base de datos
-* `docker-compose.yml` → Orquestación de servicios
-
----
-
-## 🐳 Entorno con Docker
-
-El proyecto corre con 2 servicios:
-
-* `app` → aplicación Next.js
-* `db` → base de datos PostgreSQL
-
-### 🔌 Conexión a la base de datos
-
-```env
-DATABASE_URL="postgresql://postgres:postgres@db:5432/mydb"
-```
-
----
-
-## 🚀 Cómo iniciar el proyecto
-
-### 1. Construir y levantar contenedores
-
-```bash
+app: Aplicación Next.js
+db: Base de datos PostgreSQL
+Configuración de conexión
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/inventarios_db"
+Puesta en marcha
+1. Construcción y ejecución de contenedores
 docker-compose up --build
-```
-
----
-
-### 2. Generar cliente Prisma (IMPORTANTE)
-
-```bash
+2. Generación del cliente Prisma
 docker exec -it trabajosss-app-1 sh
 npx prisma generate
 npx prisma db push
-```
-
----
-
-### 3. Abrir en el navegador
-
-```
-http://localhost:3000
-```
-
----
-
-## 🔐 Funcionalidades actuales
-
-* ✅ Registro de usuarios
-* ✅ Login con validación en base de datos
-* ✅ Redirección a dashboard
-* ✅ Persistencia básica con localStorage
-* ✅ Dashboard con mensaje de bienvenida
-
----
-
-## 🖥️ Estructura de rutas
-
-| Ruta            | Descripción         |
-| --------------- | ------------------- |
-| `/`             | Landing page        |
-| `/login`        | Inicio de sesión    |
-| `/register`     | Registro de usuario |
-| `/dashboard`    | Panel principal     |
-| `/api/login`    | API login           |
-| `/api/register` | API registro        |
-
----
-
-## 🧩 Prisma
-
-Ejemplo de modelo actual:
-
-```prisma
+3. Acceso a la aplicación
+http://localhost:3001
+Funcionalidades actuales
+Registro de usuarios
+Autenticación básica contra base de datos
+Redirección a panel principal
+Persistencia simple mediante localStorage
+Vista de dashboard inicial
+Rutas disponibles
+Ruta	Descripción
+/	Página principal
+/login	Inicio de sesión
+/register	Registro de usuario
+/dashboard	Panel de usuario
+/api/login	Endpoint de autenticación
+/api/register	Endpoint de registro
+Modelo de datos (Prisma)
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+
+  city      String?
+  company   String?
+  phone     String?
+
+  createdAt DateTime @default(now())
+
+  products  Product[]
 }
-```
+Objetivo
 
----
+Esta plantilla está orientada a:
 
-## 🎯 Objetivo del proyecto
+Acelerar la creación de aplicaciones web
+Facilitar la integración con bases de datos
+Proveer una base inicial para sistemas con autenticación
+Servir como punto de partida para arquitecturas escalables
+Estado del proyecto
+En desarrollo
+Implementación de seguridad básica
+No incluye aún hashing de contraseñas ni manejo de tokens
+Próximas mejoras
+Implementación de autenticación segura (JWT o cookies)
+Encriptación de contraseñas
+Gestión de sesiones
+Mejora de interfaz de usuario
+Protección de rutas
+Consideraciones técnicas
+Arquitectura basada en contenedores (Docker)
+Prisma como ORM principal
+Sin dependencias externas de autenticación
+Enfoque en simplicidad y mantenibilidad
+Despliegue
 
-Este proyecto sirve como base para:
+Para entornos de producción se recomienda:
 
-* Crear aplicaciones rápidamente
-* Probar integraciones con base de datos
-* Implementar autenticación
-* Escalar hacia arquitecturas más completas
-
----
-
-## ⚠️ Estado actual
-
-* Proyecto en desarrollo
-* Seguridad básica (sin hashing ni JWT aún)
-* Uso enfocado a aprendizaje y prototipos
-
----
-
-## 🔮 Próximos pasos
-
-* 🔐 Autenticación segura (JWT / cookies)
-* 🔑 Encriptación de contraseñas
-* 🧠 Manejo de sesiones real
-* 🎨 Mejora de UI/UX
-* 🛡️ Protección de rutas
-
----
-
-## 🧠 Nota para desarrolladores / IA
-
-Este proyecto:
-
-* Corre completamente en Docker
-* Usa Prisma como ORM
-* No utiliza librerías de autenticación externas
-* Prioriza simplicidad sobre complejidad
-
-Se espera:
-
-* Código claro
-* Soluciones prácticas
-* Evitar sobreingeniería
-
----
-
-## 📦 Deploy
-
-Para producción se recomienda:
-
-* Configurar variables de entorno reales
-* Usar base de datos externa
-* Implementar seguridad adecuada
-
----
-
-## 🤝 Contribución
-
-Este proyecto está diseñado como plantilla personal, pero puede adaptarse a otros casos de uso fácilmente.
-
----
-
-## 📌 Autor
-
-Proyecto desarrollado como base reutilizable para futuros desarrollos.
+Configurar variables de entorno seguras
+Utilizar un servicio de base de datos gestionado
+Implementar medidas de seguridad (hashing, autenticación robusta, protección de endpoints)

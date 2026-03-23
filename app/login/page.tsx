@@ -3,46 +3,75 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Register() {
+interface ServerUser {
+  id: string;
+  name?: string;
+  email?: string;
+}
+
+export default function Login() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    setLoading(true);
+    setMessage("");
 
-    const data = await res.json();
+    try {
+      const res = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (data.success) {
-      // 🔥 guardamos usuario
-      localStorage.setItem("user", data.user.email);
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        setMessage("Respuesta inválida del servidor");
+        setLoading(false);
+        return;
+      }
 
-      // 🔥 redirigimos
-      router.push("/dashboard");
-    } else {
-      setMessage(data.message);
+      console.log("Respuesta del login:", data);
+
+      if (res.ok) {
+        // 🔹 Ajuste: data ya es el usuario
+        const userFromServer: ServerUser = data;
+
+        const userToStore = {
+          id: userFromServer.id,
+          name: userFromServer.name || "Usuario",
+          email: userFromServer.email || "",
+        };
+
+        localStorage.setItem("user", JSON.stringify(userToStore));
+        router.push("/dashboard");
+      } else {
+        setMessage(data.message || "Credenciales incorrectas");
+      }
+    } catch (error: any) {
+      console.error(error);
+      setMessage("Error en el login ❌");
     }
+
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-600">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-80 text-black">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Iniciar sesión
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
 
         <input
-          type="email"
+          type="text"
           placeholder="Correo"
           className="w-full border p-2 mb-3 rounded"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -50,17 +79,21 @@ export default function Register() {
           type="password"
           placeholder="Contraseña"
           className="w-full border p-2 mb-5 rounded"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={handleLogin}
+          disabled={loading}
           className="w-full bg-blue-600 text-white py-2 rounded"
         >
-          Entrar
+          {loading ? "Entrando..." : "Iniciar sesión"}
         </button>
 
-        {message && <p className="mt-4 text-center">{message}</p>}
+        {message && (
+          <p className="mt-4 text-center text-sm text-red-600">{message}</p>
+        )}
       </div>
     </div>
   );

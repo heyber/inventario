@@ -1,106 +1,105 @@
-# 🧠 Contexto del Proyecto
+🧠 Contexto del Proyecto (Actualizado)
 
 Estoy desarrollando una aplicación web usando:
 
-* **Next.js (App Router)**
-* **React**
-* **Tailwind CSS**
-* **Prisma ORM**
-* **PostgreSQL**
-* **Docker + Docker Compose**
-
----
-
-## ⚙️ Arquitectura actual
+Next.js (App Router)
+React
+Tailwind CSS
+Prisma ORM
+PostgreSQL
+Docker + Docker Compose
+⚙️ Arquitectura actual
 
 El proyecto está dividido en:
 
-* **Frontend (Next.js)**: páginas en `/app`
-* **Backend (API routes)**: rutas en `/app/api`
-* **Base de datos**: PostgreSQL corriendo en Docker
-* **ORM**: Prisma conectado a la DB
+Frontend (Next.js): páginas en /app
+/app/dashboard → Dashboard principal
+/app/dashboard/inventories → Página de inventarios
+Backend (API routes): rutas en /app/api
+/api/register
+/api/login
+/api/inventory/list
+Base de datos: PostgreSQL corriendo en Docker
+ORM: Prisma conectado a la DB
+🐳 Docker
 
----
+Uso docker-compose con 2 servicios:
 
-## 🐳 Docker
-
-Uso `docker-compose` con 2 servicios:
-
-* `app`: corre Next.js
-* `db`: PostgreSQL
+app: corre Next.js
+db: PostgreSQL
 
 La conexión a la base de datos es:
 
-```
 postgresql://postgres:postgres@db:5432/mydb
-```
-
----
-
-## 🧩 Prisma
-
-* Uso `schema.prisma`
-* Ya tengo configurado el `generator client`
-* Uso `npx prisma generate` y `npx prisma db push`
-* Tengo un modelo básico:
-
-```
-User {
-  id       Int
-  email    String
+🧩 Prisma
+Uso schema.prisma
+Ya tengo configurado el generator client
+Uso npx prisma generate y npx prisma db push
+Modelo básico de usuario:
+model User {
+  id       Int @id @default(autoincrement())
+  email    String @unique
   password String
 }
-```
-
----
-
-## 🔐 Funcionalidad actual
+Modelo de inventario agregado en aprendizaje (local / sin persistencia avanzada):
+interface InventoryItem {
+  id: number;
+  codigo: string;
+  producto: string;
+  disponibilidad: number | string;
+  precio: number | string;
+}
+🔐 Funcionalidad actual
 
 Ya tengo:
 
-* Registro de usuarios (`/api/register`)
-* Login (`/api/login`)
-* Validación contra la base de datos
-* Guardado del usuario en `localStorage`
-* Redirección a `/dashboard` después de login
-
----
-
-## 🖥️ Frontend
-
-* Landing básico
-* Formulario de login/registro
-* Dashboard simple con header:
-
-  * Nombre del proyecto: **Gserucó**
-  * Mensaje: "Bienvenido, usuario"
-
----
-
-## 🎯 Objetivo actual
+Registro de usuarios (/api/register)
+Login (/api/login)
+Validación contra la base de datos
+Guardado del usuario en localStorage
+Redirección a /dashboard después de login
+📦 Nuevas funcionalidades implementadas
+Página de inventarios (/dashboard/inventories)
+Tabla de inventarios con:
+Filas dinámicas
+Hover y sombras
+Botón “Ver” que abre modal con detalles
+Modal de inventario (InventoryModal)
+Componente de subida de archivos (InventoryUploadBox)
+Simulación de Excel/CSV
+Agrega datos directamente a la tabla
+Manejo seguro aunque los datos no sean array
+Integración UI moderna con Tailwind:
+Gradientes de fondo (from-indigo-50 via-purple-50 to-pink-50)
+Botones con hover y transición
+Tabla con sombras y cabecera colorida
+Modal con sombra fuerte, borde y colores
+Dashboard adaptado para mantener usuario, header y uploads
+🖥️ Frontend
+Landing básico
+Formulario de login/registro
+Dashboard actualizado:
+Sidebar estilizado con colores y hover
+Header con fallback si falta nombre de usuario
+UserCard y StatsCard
+Inventarios con tabla, modal y subida de archivos
+🎯 Objetivo actual
 
 Quiero seguir mejorando:
 
-* Flujo de autenticación
-* UI/UX del dashboard
-* Manejo de sesión (mejor que localStorage)
-* Estructura limpia para usar este proyecto como plantilla
-
----
-
-## ⚠️ Consideraciones
-
-* Es un proyecto de aprendizaje / base
-* No tiene seguridad avanzada aún (sin JWT, sin hash de contraseñas)
-* Todo corre en entorno local con Docker
-
----
-
-## ✅ Qué espero de la IA
-
-* Soluciones simples y funcionales
-* Código claro, sin sobreingeniería
-* Explicaciones prácticas (no teóricas)
-* Enfoque en desarrollo real (no académico)
-
----
+Flujo de autenticación (con mejores sesiones que localStorage)
+UI/UX del dashboard y tablas
+Lectura real de archivos Excel/CSV (xlsx)
+Manejo de inventarios persistente en la base de datos
+Estructura limpia para usar este proyecto como plantilla
+⚠️ Consideraciones
+Es un proyecto de aprendizaje / base
+Seguridad mínima (sin JWT ni hash avanzado todavía)
+Todo corre en entorno local con Docker
+Tipado con TypeScript pero todavía flexible (any) para inventarios
+✅ Qué espero de la IA
+Soluciones simples y funcionales
+Código claro, sin sobreingeniería
+Explicaciones prácticas (no teóricas)
+Enfoque en desarrollo real (no académico)
+Ayuda con UI moderna y manejo seguro de inventarios

@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -10,14 +9,12 @@ export async function POST(req: Request) {
   });
 
   if (!user || user.password !== password) {
-    return Response.json({
-      success: false,
-      message: "Credenciales incorrectas ❌",
-    });
+    return NextResponse.json(
+      { message: "Credenciales incorrectas" },
+      { status: 401 }
+    );
   }
 
-  return Response.json({
-    success: true,
-    user,
-  });
+  // 🔥 ESTO ES LO IMPORTANTE
+  return NextResponse.json(user);
 }

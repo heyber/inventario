@@ -1,33 +1,72 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
+import UserCard from "./components/UserCard";
+import StatsCard from "./components/StatsCard";
+import UploadBox from "./components/UploadBox";
 
-export default function Dashboard() {
-  const [user, setUser] = useState("");
+// Tipado seguro del usuario
+interface User {
+  id: string;
+  name?: string;
+  email?: string;
+}
 
+export default function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  // Cargar usuario desde localStorage
   useEffect(() => {
+    setLoadingUser(true);
+
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(storedUser);
+
+    try {
+      const parsedUser: User | null = storedUser ? JSON.parse(storedUser) : null;
+
+      if (!parsedUser || !parsedUser.id) throw new Error("Usuario inválido");
+
+      setUser(parsedUser);
+    } catch (err) {
+      console.warn("Usuario inválido en localStorage, se limpia");
+      localStorage.removeItem("user");
+      setUser(null);
+    } finally {
+      setLoadingUser(false);
     }
   }, []);
 
   return (
-    <div className="min-h-screen bg-blue-100">
-      
-      {/* HEADER */}
-      <div className="bg-blue-600 text-white p-4 flex justify-between">
-        <h1 className="font-bold">Gserucó</h1>
-        <span>Bienvenido, {user}</span>
-      </div>
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar />
 
-      {/* CONTENIDO */}
-      <div className="p-8">
-        <h2 className="text-2xl font-bold mb-4">
-          Dashboard
-        </h2>
+      <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+        {/* Mostrar estado de carga */}
+        {loadingUser && <p>Cargando usuario...</p>}
 
-        <p>Ya estás conectado a la base de datos ✅</p>
+        {/* Mensaje si no hay usuario */}
+        {!loadingUser && !user && (
+          <p className="text-red-500 font-semibold">No hay usuario logueado</p>
+        )}
+
+        {/* Header con fallback si falta name */}
+        {user && <Header user={{ name: user.name || "Usuario" }} />}
+
+        {/* UserCard */}
+        {user && <UserCard user={user} />}
+
+        {/* Estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatsCard title="Registros" value="120" />
+          <StatsCard title="Archivos" value="8" />
+          <StatsCard title="Usuarios" value="3" />
+        </div>
+
+        {/* UploadBox seguro */}
+        <UploadBox user={user} />
       </div>
     </div>
   );
