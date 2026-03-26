@@ -8,6 +8,7 @@ Tailwind CSS
 Prisma ORM
 PostgreSQL
 Docker + Docker Compose
+
 ⚙️ Arquitectura actual
 
 El proyecto está dividido en:
@@ -15,12 +16,20 @@ El proyecto está dividido en:
 Frontend (Next.js): páginas en /app
 /app/dashboard → Dashboard principal
 /app/dashboard/inventories → Página de inventarios
+
 Backend (API routes): rutas en /app/api
+
 /api/register
 /api/login
-/api/inventory/list
+
+/api/inventory-file/create
+/api/inventory-file/list
+/api/inventory-file/update
+/api/inventory-file/delete
+
 Base de datos: PostgreSQL corriendo en Docker
 ORM: Prisma conectado a la DB
+
 🐳 Docker
 
 Uso docker-compose con 2 servicios:
@@ -31,24 +40,49 @@ db: PostgreSQL
 La conexión a la base de datos es:
 
 postgresql://postgres:postgres@db:5432/mydb
+
 🧩 Prisma
+
 Uso schema.prisma
 Ya tengo configurado el generator client
 Uso npx prisma generate y npx prisma db push
-Modelo básico de usuario:
+
+Modelo de usuario:
+
 model User {
-  id       Int @id @default(autoincrement())
-  email    String @unique
-  password String
+id String @id @default(cuid())
+name String?
+email String @unique
+password String
+
+city String?
+company String?
+phone String?
+
+createdAt DateTime @default(now())
+
+products Product[]
+inventories Inventory[]
+inventoryFiles InventoryFile[]
 }
-Modelo de inventario agregado en aprendizaje (local / sin persistencia avanzada):
-interface InventoryItem {
-  id: number;
-  codigo: string;
-  producto: string;
-  disponibilidad: number | string;
-  precio: number | string;
+
+Modelo de archivo de inventario (principal actual):
+
+model InventoryFile {
+id String @id @default(cuid())
+name String
+description String?
+data Json
+userId String
+createdAt DateTime @default(now())
+
+user User @relation(fields: [userId], references: [id])
 }
+
+Nota:
+El modelo Inventory quedó como modelo antiguo para filas individuales,
+pero el sistema actual trabaja con InventoryFile (archivos completos de Excel).
+
 🔐 Funcionalidad actual
 
 Ya tengo:
@@ -58,48 +92,110 @@ Login (/api/login)
 Validación contra la base de datos
 Guardado del usuario en localStorage
 Redirección a /dashboard después de login
+
 📦 Nuevas funcionalidades implementadas
-Página de inventarios (/dashboard/inventories)
-Tabla de inventarios con:
-Filas dinámicas
-Hover y sombras
-Botón “Ver” que abre modal con detalles
-Modal de inventario (InventoryModal)
-Componente de subida de archivos (InventoryUploadBox)
-Simulación de Excel/CSV
-Agrega datos directamente a la tabla
-Manejo seguro aunque los datos no sean array
-Integración UI moderna con Tailwind:
-Gradientes de fondo (from-indigo-50 via-purple-50 to-pink-50)
-Botones con hover y transición
-Tabla con sombras y cabecera colorida
-Modal con sombra fuerte, borde y colores
-Dashboard adaptado para mantener usuario, header y uploads
+
+Sistema de inventarios basado en archivos Excel:
+
+Subida de archivos .xlsx
+Lectura real del Excel usando librería xlsx
+Conversión a JSON (cleanData)
+Normalización de headers (lowercase)
+
+Persistencia en base de datos:
+
+Guardado del archivo completo en PostgreSQL
+Uso de Prisma con campo Json
+Relación con usuario
+
+Listado de inventarios:
+
+Tabla con:
+Nombre del archivo
+Descripción
+Fecha de creación
+Botones de acción
+
+Acciones disponibles:
+
+Ver → abre modal con tabla completa del Excel
+Eliminar → elimina el archivo desde la DB
+
+Modal de inventario:
+
+Render dinámico de tabla según headers del Excel
+Visualización completa del contenido
+Scroll horizontal y vertical
+Diseño limpio y legible
+
 🖥️ Frontend
-Landing básico
-Formulario de login/registro
-Dashboard actualizado:
-Sidebar estilizado con colores y hover
-Header con fallback si falta nombre de usuario
-UserCard y StatsCard
-Inventarios con tabla, modal y subida de archivos
+
+Componentes principales:
+
+InventoryUploadBox
+→ Lee el Excel y envía data al page
+
+InventoryTable
+→ Lista los archivos guardados
+→ Botones de ver y eliminar
+
+InventoryModal
+→ Muestra el contenido completo del Excel
+
+Flujo actual:
+
+Upload Excel
+→ InventoryUploadBox
+→ page.tsx (fetch API)
+→ /api/inventory-file/create
+→ PostgreSQL
+
+Luego:
+
+useEffect
+→ /api/inventory-file/list
+→ InventoryTable
+
+Acción “Ver”
+→ abre InventoryModal
+
+🎨 UI / UX
+
+Uso de Tailwind CSS con:
+
+Gradientes de fondo
+Tablas con headers en indigo
+Hover en filas
+Botones con colores claros (indigo / rojo)
+Modal con sombra y bordes definidos
+
+Problemas de contraste ya corregidos
+Colores visibles y legibles en tablas
+
 🎯 Objetivo actual
 
-Quiero seguir mejorando:
+Seguir mejorando:
 
-Flujo de autenticación (con mejores sesiones que localStorage)
-UI/UX del dashboard y tablas
-Lectura real de archivos Excel/CSV (xlsx)
-Manejo de inventarios persistente en la base de datos
-Estructura limpia para usar este proyecto como plantilla
+Edición de datos dentro del modal (update)
+Mejor flujo de autenticación (reemplazar localStorage)
+Mejorar UI/UX del dashboard
+Optimizar manejo de archivos grandes
+Estructura limpia para usar como plantilla SaaS
+
 ⚠️ Consideraciones
-Es un proyecto de aprendizaje / base
-Seguridad mínima (sin JWT ni hash avanzado todavía)
+
+Proyecto de aprendizaje / base
+Seguridad básica (sin JWT ni hashing avanzado aún)
 Todo corre en entorno local con Docker
-Tipado con TypeScript pero todavía flexible (any) para inventarios
-✅ Qué espero de la IA
-Soluciones simples y funcionales
-Código claro, sin sobreingeniería
-Explicaciones prácticas (no teóricas)
-Enfoque en desarrollo real (no académico)
-Ayuda con UI moderna y manejo seguro de inventarios
+Uso flexible de TypeScript (any en algunas partes)
+Persistencia ya implementada correctamente
+
+✅ Estado actual del sistema
+
+✔ Subida de Excel funcional
+✔ Lectura real de archivos
+✔ Persistencia en base de datos
+✔ Listado de archivos
+✔ Visualización completa en modal
+✔ Eliminación de archivos
+✔ UI estable y legible

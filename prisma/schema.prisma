@@ -19,8 +19,9 @@ model User {
 
   createdAt DateTime @default(now())
 
-  products    Product[]
-  inventories Inventory[]
+  products        Product[]
+  inventories     Inventory[]
+  inventoryFiles  InventoryFile[]   
 }
 
 model Product {
@@ -41,6 +42,17 @@ model Inventory {
   disponibilidad Int
   precio       Float
   createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model InventoryFile {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  data        Json     // 🔥 aquí va TODO el Excel
+  userId      String
+  createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }

@@ -8,44 +8,107 @@ interface InventoryTableProps {
   loading: boolean;
 }
 
-export default function InventoryTable({ inventories = [], loading }: InventoryTableProps) {
+export default function InventoryTable({ inventories, loading }: InventoryTableProps) {
   const [selectedInventory, setSelectedInventory] = useState<any>(null);
 
-  if (loading) return <p className="text-center py-4 text-gray-500">Cargando inventarios...</p>;
-  if (!Array.isArray(inventories) || inventories.length === 0)
-    return <p className="text-center py-4 text-gray-500">No hay inventarios cargados.</p>;
+  if (loading) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+        <p className="text-gray-800 font-medium">Cargando inventarios...</p>
+      </div>
+    );
+  }
+
+  if (!inventories || inventories.length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+        <p className="text-gray-800 font-medium">No hay inventarios cargados</p>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <table className="min-w-full border border-gray-300 shadow-lg rounded-lg overflow-hidden">
-        <thead className="bg-indigo-200 text-indigo-900 uppercase text-sm font-semibold">
-          <tr>
-            <th className="py-3 px-4 border">Código</th>
-            <th className="py-3 px-4 border">Producto</th>
-            <th className="py-3 px-4 border">Disponibilidad</th>
-            <th className="py-3 px-4 border">Precio</th>
-            <th className="py-3 px-4 border">Acciones</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {(Array.isArray(inventories) ? inventories : []).map((inv) => (
-            <tr key={inv.id} className="hover:bg-indigo-50 transition">
-              <td className="py-2 px-4 border">{inv.codigo}</td>
-              <td className="py-2 px-4 border">{inv.producto}</td>
-              <td className="py-2 px-4 border">{inv.disponibilidad}</td>
-              <td className="py-2 px-4 border">{inv.precio}</td>
-              <td className="py-2 px-4 border">
-                <button
-                  className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition"
-                  onClick={() => setSelectedInventory(inv)}
-                >
-                  Ver
-                </button>
-              </td>
+    <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+      <h2 className="text-xl font-bold mb-4 text-gray-900">
+        Archivos de Inventario
+      </h2>
+
+      <div className="overflow-x-auto rounded-lg border border-gray-300">
+        <table className="min-w-full text-sm">
+          
+          <thead className="bg-indigo-600">
+            <tr>
+              <th className="px-4 py-3 text-left text-white font-semibold">
+                Nombre
+              </th>
+              <th className="px-4 py-3 text-left text-white font-semibold">
+                Descripción
+              </th>
+              <th className="px-4 py-3 text-left text-white font-semibold">
+                Fecha
+              </th>
+              <th className="px-4 py-3 text-left text-white font-semibold">
+                Acciones
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody className="bg-white">
+            {inventories.map((inv) => (
+              <tr
+                key={inv.id}
+                className="border-b hover:bg-indigo-50 transition"
+              >
+                <td className="px-4 py-3 text-gray-900 font-medium">
+                  {inv.name}
+                </td>
+
+                <td className="px-4 py-3 text-gray-800">
+                  {inv.description || "Sin descripción"}
+                </td>
+
+                <td className="px-4 py-3 text-gray-700">
+                  {new Date(inv.createdAt).toLocaleDateString()}
+                </td>
+
+                <td className="px-4 py-3 flex gap-2">
+                  <button
+                    className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition"
+                    onClick={() => setSelectedInventory(inv)}
+                  >
+                    Ver
+                  </button>
+
+                  <button
+                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                    onClick={async () => {
+                      const confirmDelete = confirm("¿Eliminar este inventario?");
+                      if (!confirmDelete) return;
+
+                      try {
+                        await fetch("/api/inventory-file/delete", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({ id: inv.id }),
+                        });
+
+                        window.location.reload();
+                      } catch (error) {
+                        console.error("Error eliminando:", error);
+                      }
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
+      </div>
 
       {selectedInventory && (
         <InventoryModal
@@ -53,6 +116,6 @@ export default function InventoryTable({ inventories = [], loading }: InventoryT
           onClose={() => setSelectedInventory(null)}
         />
       )}
-    </>
+    </div>
   );
 }
