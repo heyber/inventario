@@ -1,201 +1,220 @@
-🧠 Contexto del Proyecto (Actualizado)
+🟢 LO QUE YA TIENES (MUY BIEN)
 
-Estoy desarrollando una aplicación web usando:
+Tu sistema actualmente es:
 
-Next.js (App Router)
-React
-Tailwind CSS
-Prisma ORM
-PostgreSQL
-Docker + Docker Compose
+Excel → xlsx → JSON → PostgreSQL (Json) → Dashboard → PDF
 
-⚙️ Arquitectura actual
+Y tienes:
 
-El proyecto está dividido en:
+✅ Upload multi-hoja real
+✅ Normalización básica
+✅ Persistencia en DB (Json flexible)
+✅ CRUD completo de inventarios
+✅ Visualización tipo tabla + modal editable
+✅ Dashboard con KPIs y gráficas
+✅ Exportación Excel + PDF
+✅ Docker listo
+✅ Base SaaS (usuarios + archivos)
 
-Frontend (Next.js): páginas en /app
-/app/dashboard → Dashboard principal
-/app/dashboard/inventories → Página de inventarios
+👉 Esto NO es básico.
 
-Backend (API routes): rutas en /app/api
+🔥 Esto ya es un MVP funcional tipo producto real
 
-/api/register
-/api/login
+⚠️ PROBLEMA ESTRUCTURAL (EL MÁS IMPORTANTE)
 
-/api/inventory-file/create
-/api/inventory-file/list
-/api/inventory-file/update
-/api/inventory-file/delete
+Tu sistema depende de:
 
-Base de datos: PostgreSQL corriendo en Docker
-ORM: Prisma conectado a la DB
+data: Json
 
-🐳 Docker
+👉 Eso es flexible PERO:
 
-Uso docker-compose con 2 servicios:
+❌ difícil de escalar
+❌ difícil de consultar
+❌ propenso a errores (como los que tuviste)
+❌ no optimizado para dashboards complejos
 
-app: corre Next.js
-db: PostgreSQL
+🧠 DECISIÓN CLAVE (FUTURO)
 
-La conexión a la base de datos es:
+Tienes 2 caminos:
 
-postgresql://postgres:postgres@db:5432/mydb
+🟡 OPCIÓN A — Mantener JSON (rápido, flexible)
 
-🧩 Prisma
+✔ bueno para MVP
+✔ cambios rápidos
+❌ limitado a futuro
 
-Uso schema.prisma
-Ya tengo configurado el generator client
-Uso npx prisma generate y npx prisma db push
+🔥 OPCIÓN B — NORMALIZAR (RECOMENDADO)
 
-Modelo de usuario:
+Convertir Excel → tablas reales:
 
-model User {
-id String @id @default(cuid())
-name String?
-email String @unique
-password String
+Pedido
+Producto
+Proveedor
+Calendario
 
-city String?
-company String?
-phone String?
+👉 y relacionarlas con Prisma
 
-createdAt DateTime @default(now())
+🧱 PROPUESTA DE MODELO (FUTURO)
+model Pedido {
+  id                String @id @default(cuid())
+  cantidad          Int
+  precio            Float
+  precioTotal       Float
+  fechaPedido       DateTime
+  fechaEntrega      DateTime
+  estadoPedido      String
 
-products Product[]
-inventories Inventory[]
-inventoryFiles InventoryFile[]
+  productoId        String
+  proveedorId       String
+
+  producto          Producto @relation(fields: [productoId], references: [id])
+  proveedor         Proveedor @relation(fields: [proveedorId], references: [id])
 }
 
-Modelo de archivo de inventario (principal actual):
-
-model InventoryFile {
-id String @id @default(cuid())
-name String
-description String?
-data Json
-userId String
-createdAt DateTime @default(now())
-
-user User @relation(fields: [userId], references: [id])
+model Producto {
+  id        String @id @default(cuid())
+  nombre    String
+  codigo    String
 }
 
-Nota:
-El modelo Inventory quedó como modelo antiguo para filas individuales,
-pero el sistema actual trabaja con InventoryFile (archivos completos de Excel).
+model Proveedor {
+  id        String @id @default(cuid())
+  nombre    String
+  codigo    String
+}
+🔥 ¿QUÉ GANAS CON ESTO?
 
-🔐 Funcionalidad actual
+✅ queries reales (groupBy, sum, etc.)
+✅ dashboards más rápidos
+✅ filtros sin hacks
+✅ escalabilidad SaaS real
 
-Ya tengo:
+📊 DASHBOARD (TU SIGUIENTE NIVEL)
 
-Registro de usuarios (/api/register)
-Login (/api/login)
-Validación contra la base de datos
-Guardado del usuario en localStorage
-Redirección a /dashboard después de login
+Ahora tienes:
 
-📦 Nuevas funcionalidades implementadas
+✔ KPIs básicos
+✔ gráfica de productos
 
-Sistema de inventarios basado en archivos Excel:
+🔥 DEBES AGREGAR (IMPORTANTE)
+📈 KPIs PRO
+💰 Gasto total (✔ ya)
+📦 Cantidad (✔ ya)
+🧾 Pedidos (✔ ya)
+🔥 Ticket promedio (✔ ya)
 
-Subida de archivos .xlsx
-Lectura real del Excel usando librería xlsx
-Conversión a JSON (cleanData)
-Normalización de headers (lowercase)
+👉 AGREGAR:
 
-Persistencia en base de datos:
+⏱ Tiempo promedio de entrega
+⚠ % pedidos retrasados
+🏢 proveedor más costoso
+📉 producto menos rotado
+📊 GRÁFICAS QUE TE FALTAN
 
-Guardado del archivo completo en PostgreSQL
-Uso de Prisma con campo Json
-Relación con usuario
+👉 ahora solo tienes barras
 
-Listado de inventarios:
+🔥 agrega:
+🍩 Distribución por producto (Pie)
+📈 Gasto por mes (Line)
+🏢 Gasto por proveedor (Bar)
+📊 Top 10 productos
+🎛 FILTROS (MEJORAR)
 
-Tabla con:
-Nombre del archivo
-Descripción
-Fecha de creación
-Botones de acción
+Ahora tienes:
 
-Acciones disponibles:
+✔ mes
+✔ producto
+✔ proveedor
 
-Ver → abre modal con tabla completa del Excel
-Eliminar → elimina el archivo desde la DB
+🔥 DEBES AGREGAR
+rango de fechas (inicio - fin)
+estado del pedido
+búsqueda libre
+multi-select (varios proveedores)
+📄 EXPORTACIÓN (SIGUIENTE NIVEL)
 
-Modal de inventario:
+Ahora:
 
-Render dinámico de tabla según headers del Excel
-Visualización completa del contenido
-Scroll horizontal y vertical
-Diseño limpio y legible
+✔ funciona
+❌ básico visualmente
 
-🖥️ Frontend
+🔥 PROPUESTA PRO
 
-Componentes principales:
+Generar PDF tipo:
 
-InventoryUploadBox
-→ Lee el Excel y envía data al page
+REPORTE DE COMPRAS
 
-InventoryTable
-→ Lista los archivos guardados
-→ Botones de ver y eliminar
+Resumen ejecutivo
+KPIs
+Gráficas
+Conclusiones automáticas
 
-InventoryModal
-→ Muestra el contenido completo del Excel
+👉 incluso puedes generar insights como:
 
-Flujo actual:
+“El proveedor X representa el 45% del gasto”
+“El mes con mayor consumo fue marzo”
+🧠 UX/UI (DONDE MÁS PUEDES MEJORAR)
 
-Upload Excel
-→ InventoryUploadBox
-→ page.tsx (fetch API)
-→ /api/inventory-file/create
-→ PostgreSQL
+Ahora mismo:
 
-Luego:
+✔ funcional
+❌ inconsistente visualmente
 
-useEffect
-→ /api/inventory-file/list
-→ InventoryTable
+🔥 MEJORA RÁPIDA
+usa SOLO 1 color primario (ej: indigo)
+grises consistentes
+eliminar colores random (fucsia, verde, etc.)
+tipografía uniforme
+⚡ PERFORMANCE (IMPORTANTE PRONTO)
 
-Acción “Ver”
-→ abre InventoryModal
+Cuando crezca:
 
-🎨 UI / UX
+👉 JSON grande = lento
 
-Uso de Tailwind CSS con:
+🔥 soluciones:
+memoización (ya lo haces bien)
+paginación
+virtualización
+backend aggregation (más adelante)
+🔐 AUTENTICACIÓN
 
-Gradientes de fondo
-Tablas con headers en indigo
-Hover en filas
-Botones con colores claros (indigo / rojo)
-Modal con sombra y bordes definidos
+Ahora:
 
-Problemas de contraste ya corregidos
-Colores visibles y legibles en tablas
+localStorage
+🔥 debes migrar a:
+JWT
+o NextAuth
+🏢 VISIÓN SaaS (LO QUE YA TIENES)
 
-🎯 Objetivo actual
+Tu modelo YA permite:
 
-Seguir mejorando:
+Usuario → múltiples inventarios → múltiples dashboards
 
-Edición de datos dentro del modal (update)
-Mejor flujo de autenticación (reemplazar localStorage)
-Mejorar UI/UX del dashboard
-Optimizar manejo de archivos grandes
-Estructura limpia para usar como plantilla SaaS
+👉 esto es base de producto vendible
 
-⚠️ Consideraciones
+🔥 SIGUIENTE PASO
+selector de dashboard por archivo ✔ (ya lo empezaste)
+compartir dashboards
+roles (admin / viewer)
+🧠 STACK ACTUAL (BIEN)
 
-Proyecto de aprendizaje / base
-Seguridad básica (sin JWT ni hashing avanzado aún)
-Todo corre en entorno local con Docker
-Uso flexible de TypeScript (any en algunas partes)
-Persistencia ya implementada correctamente
+Ya estás usando:
 
-✅ Estado actual del sistema
-
-✔ Subida de Excel funcional
-✔ Lectura real de archivos
-✔ Persistencia en base de datos
-✔ Listado de archivos
-✔ Visualización completa en modal
-✔ Eliminación de archivos
-✔ UI estable y legible
+Next.js App Router ✅
+Prisma ✅
+PostgreSQL ✅
+Tailwind ✅
+Recharts ✅
+Docker ✅
+🔥 AGREGAR PRONTO
+TanStack Query (fetching pro)
+Zustand (estado global)
+Zod (validaciones)
+date-fns (fechas)
+🎯 RESUMEN CLARO
+LO MÁS IMPORTANTE AHORA
+🔥 estabilizar dashboard (ya casi lo lograste)
+🔥 mejorar gráficas
+🔥 mejorar filtros
+🔥 mejorar PDF
+🧠 decidir si migras de JSON → modelo real

@@ -13,7 +13,7 @@ export default function InventoryTable({ inventories, loading }: InventoryTableP
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+      <div className="inventory-table-container">
         <p className="text-gray-800 font-medium">Cargando inventarios...</p>
       </div>
     );
@@ -21,90 +21,102 @@ export default function InventoryTable({ inventories, loading }: InventoryTableP
 
   if (!inventories || inventories.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+      <div className="inventory-table-container">
         <p className="text-gray-800 font-medium">No hay inventarios cargados</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-      <h2 className="text-xl font-bold mb-4 text-gray-900">
-        Archivos de Inventario
-      </h2>
+    <div className="inventory-table-container">
+      <h2 className="inventory-table-title">Archivos de Inventario</h2>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-300">
-        <table className="min-w-full text-sm">
+      <div className="inventory-table-wrapper">
+        <table className="inventory-table">
           
-          <thead className="bg-indigo-600">
+          <thead className="inventory-table-header">
             <tr>
-              <th className="px-4 py-3 text-left text-white font-semibold">
-                Nombre
-              </th>
-              <th className="px-4 py-3 text-left text-white font-semibold">
-                Descripción
-              </th>
-              <th className="px-4 py-3 text-left text-white font-semibold">
-                Fecha
-              </th>
-              <th className="px-4 py-3 text-left text-white font-semibold">
-                Acciones
-              </th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
             </tr>
           </thead>
 
-          <tbody className="bg-white">
-            {inventories.map((inv) => (
-              <tr
-                key={inv.id}
-                className="border-b hover:bg-indigo-50 transition"
-              >
-                <td className="px-4 py-3 text-gray-900 font-medium">
-                  {inv.name}
-                </td>
+          <tbody className="inventory-table-body">
+            {inventories.map((inv) => {
+              let parsedData = inv.data;
+              try {
+                if (typeof parsedData === "string") {
+                  parsedData = JSON.parse(parsedData);
+                }
+              } catch {
+                parsedData = [];
+              }
 
-                <td className="px-4 py-3 text-gray-800">
-                  {inv.description || "Sin descripción"}
-                </td>
+              return (
+                <tr key={inv.id}>
+                  <td className="name">{inv.name}</td>
+                  <td className="description">{inv.description || "Sin descripción"}</td>
+                  <td className="date">{new Date(inv.createdAt).toLocaleDateString()}</td>
+                  <td className="flex gap-2">
 
-                <td className="px-4 py-3 text-gray-700">
-                  {new Date(inv.createdAt).toLocaleDateString()}
-                </td>
+                    <button
+                      className="btn btn-view"
+                      onClick={() => setSelectedInventory({ ...inv, data: parsedData })}
+                    >
+                      Ver
+                    </button>
 
-                <td className="px-4 py-3 flex gap-2">
-                  <button
-                    className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition"
-                    onClick={() => setSelectedInventory(inv)}
-                  >
-                    Ver
-                  </button>
+                    <button
+                      className="btn btn-export"
+                      onClick={() => {
+                        import("xlsx").then((XLSX) => {
+                          const workbook = XLSX.utils.book_new();
 
-                  <button
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
-                    onClick={async () => {
-                      const confirmDelete = confirm("¿Eliminar este inventario?");
-                      if (!confirmDelete) return;
+                          if (inv.type === "multi" && parsedData?.sheets) {
+                            parsedData.sheets.forEach((sheet: any) => {
+                              const ws = XLSX.utils.json_to_sheet(sheet.data || []);
+                              XLSX.utils.book_append_sheet(workbook, ws, sheet.name || "Sheet");
+                            });
+                          } else {
+                            const ws = XLSX.utils.json_to_sheet(parsedData || []);
+                            XLSX.utils.book_append_sheet(workbook, ws, "Inventario");
+                          }
 
-                      try {
-                        await fetch("/api/inventory-file/delete", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({ id: inv.id }),
+                          XLSX.writeFile(workbook, `${inv.name || "inventario"}.xlsx`);
                         });
+                      }}
+                    >
+                      Exportar
+                    </button>
 
-                        window.location.reload();
-                      } catch (error) {
-                        console.error("Error eliminando:", error);
-                      }
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <button
+                      className="btn btn-delete"
+                      onClick={async () => {
+                        const confirmDelete = confirm("¿Eliminar este inventario?");
+                        if (!confirmDelete) return;
+
+                        try {
+                          await fetch("/api/inventory-file/delete", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: inv.id }),
+                          });
+
+                          window.location.reload();
+                        } catch (error) {
+                          console.error("Error eliminando:", error);
+                        }
+                      }}
+                    >
+                      Eliminar
+                    </button>
+
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
 
         </table>

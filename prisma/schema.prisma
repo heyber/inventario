@@ -35,13 +35,13 @@ model Product {
 }
 
 model Inventory {
-  id           String   @id @default(cuid())
-  userId       String
-  codigo       Int
-  producto     String
+  id             String   @id @default(cuid())
+  userId         String
+  codigo         Int
+  producto       String
   disponibilidad Int
-  precio       Float
-  createdAt    DateTime @default(now())
+  precio         Float
+  createdAt      DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -50,9 +50,16 @@ model InventoryFile {
   id          String   @id @default(cuid())
   name        String
   description String?
-  data        Json     // 🔥 aquí va TODO el Excel
+
+  type        String?  // 👈 NUEVO: "simple" | "multi"
+
+  data        Json     // 🔥 soporta ambos formatos
+
   userId      String
   createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
 }

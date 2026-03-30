@@ -1,26 +1,423 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 🧱 LAYOUT */
+  .row {
+    @apply flex items-center gap-2;
+  }
+
+  .col {
+    @apply flex flex-col gap-2;
+  }
+
+  /* 📦 CARD BASE */
+  .card {
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-4;
+  }
+
+  .card-hover {
+    @apply hover:shadow-md transition;
+  }
+
+  /* 🔘 BOTONES */
+  .btn {
+    @apply px-4 py-2 rounded-lg text-sm font-medium transition;
+  }
+
+  .btn-primary {
+    @apply btn bg-indigo-500 text-white hover:bg-indigo-600;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300;
+  }
+
+  /* 📝 INPUTS */
+  .input {
+    @apply border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-900;
+  }
+
+  /* 📊 KPI */
+  .kpi {
+    @apply card col;
+  }
+
+  .kpi-title {
+    @apply text-sm text-gray-500;
+  }
+
+  .kpi-value {
+    @apply text-2xl font-semibold;
+  }
+
+  /* 📋 TABLAS */
+  .table {
+    @apply w-full text-sm;
+  }
+
+  .table-row {
+    @apply border-b hover:bg-gray-50 dark:hover:bg-gray-800;
+  }
+
 }
+@layer components {
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* 🧱 LAYOUT PRINCIPAL */
+  .layout {
+    @apply flex h-screen bg-gray-100 dark:bg-gray-950;
+  }
+
+  .main {
+    @apply flex-1 p-6 space-y-6 overflow-y-auto;
+  }
+
+  /* 🧾 TEXTOS */
+  .text-error {
+    @apply text-red-500 font-semibold;
+  }
+
+  .text-loading {
+    @apply text-sm text-gray-500;
+  }
+
 }
+@layer components {
+  .layout {
+    @apply flex h-screen bg-white; /* fondo blanco para toda la dashboard */
+  }
+  .main {
+    @apply flex-1 p-6 overflow-y-auto space-y-6;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* 🧾 HEADERS */
+  .page-title {
+    @apply text-2xl font-semibold text-gray-900 dark:text-gray-100;
+  }
+
+  /* 📦 SECCIONES */
+  .section {
+    @apply space-y-4;
+  }
+
+}
+@layer components {
+
+  /* 🧱 SIDEBAR */
+  .sidebar {
+    @apply w-64 bg-blue-600 text-white p-5 flex flex-col;
+  }
+
+  .sidebar-title {
+    @apply text-2xl font-bold mb-8;
+  }
+
+  .sidebar-nav {
+    @apply space-y-2;
+  }
+
+  .sidebar-item {
+    @apply p-2 rounded-lg cursor-pointer transition;
+  }
+
+  .sidebar-item-primary {
+    @apply bg-blue-500;
+  }
+
+  .sidebar-item-hover:hover {
+    @apply bg-blue-500;
+  }
+
+}
+@layer components {
+
+  /* 📦 UPLOAD BOX */
+  .upload-box {
+    @apply mb-6;
+  }
+
+  .upload-input {
+    @apply block w-full text-sm text-gray-700 cursor-pointer;
+  }
+
+  /* Tailwind file pseudo-class */
+  .upload-input::file-selector-button {
+    @apply mr-4 py-2 px-4 rounded-lg border-0 text-sm font-semibold
+           bg-indigo-600 text-white hover:bg-indigo-700 transition;
   }
 }
+@layer components {
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* 📄 INVENTORY TABLE */
+  .inventory-table-container {
+    @apply bg-white p-6 rounded-xl shadow border border-gray-200;
+  }
+
+  .inventory-table-title {
+    @apply text-xl font-bold mb-4 text-gray-900;
+  }
+
+  .inventory-table-wrapper {
+    @apply overflow-x-auto rounded-lg border border-gray-300;
+  }
+
+  .inventory-table {
+    @apply min-w-full text-sm;
+  }
+
+  .inventory-table-header {
+    @apply bg-indigo-600;
+  }
+
+  .inventory-table-header th {
+    @apply px-4 py-3 text-left text-white font-semibold;
+  }
+
+  .inventory-table-body tr {
+    @apply border-b transition hover:bg-indigo-50;
+  }
+
+  .inventory-table-body td {
+    @apply px-4 py-3;
+  }
+
+  .inventory-table-body td.name {
+    @apply text-gray-900 font-medium;
+  }
+
+  .inventory-table-body td.description {
+    @apply text-gray-800;
+  }
+
+  .inventory-table-body td.date {
+    @apply text-gray-700;
+  }
+
+  /* Botones */
+  .btn {
+    @apply px-3 py-1 rounded text-white transition;
+  }
+
+  .btn-view {
+    @apply bg-indigo-600 hover:bg-indigo-700;
+  }
+
+  .btn-export {
+    @apply bg-green-600 hover:bg-green-700;
+  }
+
+  .btn-delete {
+    @apply bg-red-600 hover:bg-red-700;
+  }
+}
+@layer components {
+
+  /* HEADER DASHBOARD */
+  .dashboard-header {
+    @apply flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border;
+  }
+
+  .dashboard-header-left h2 {
+    @apply text-xl font-semibold text-gray-800;
+  }
+
+  .dashboard-header-left p {
+    @apply text-sm text-gray-500;
+  }
+
+  .dashboard-header-right {
+    @apply flex items-center gap-4;
+  }
+
+  .dashboard-user-badge {
+    @apply bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm;
+  }
+
+  .dashboard-logout-btn {
+    @apply bg-red-500 text-white px-3 py-1 rounded-lg text-sm transition hover:bg-red-600;
+  }
+}
+@layer components {
+
+  /* CONTENEDOR PRINCIPAL DEL DASHBOARD */
+  .dashboard-container {
+    @apply space-y-6 p-4 rounded-xl;
+    background-color: #f9fafb; /* color de fondo para export PDF */
+  }
+
+  /* CONTENEDOR DE GRÁFICA */
+  .dashboard-chart-container {
+    @apply bg-white p-4 rounded-xl shadow;
+  }
+
+  /* TÍTULOS DE SECCIONES */
+  .dashboard-section-title {
+    @apply font-bold mb-4 text-gray-700;
+  }
+
+  /* TEXTO CUANDO NO HAY DATOS */
+  .dashboard-empty-text {
+    @apply text-gray-400;
+  }
+}
+/* KPIs */
+.kpi-card {
+  @apply bg-white border-l-4 p-4 rounded shadow;
+}
+
+.kpi-indigo { @apply border-indigo-500; }
+.kpi-blue { @apply border-blue-500; }
+.kpi-purple { @apply border-purple-500; }
+.kpi-green { @apply border-green-500; }
+/* Dashboard Header */
+.dashboard-header {
+  @apply bg-white p-4 rounded-xl shadow flex gap-4;
+}
+
+.dashboard-select {
+  @apply p-2 border rounded text-gray-800;
+}
+
+.dashboard-option {
+  @apply text-black;
+}
+
+.dashboard-btn {
+  @apply bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition;
+}
+/* Dashboard Filters */
+.dashboard-filters {
+  @apply bg-white p-4 rounded-xl shadow flex gap-4 flex-wrap;
+}
+
+.dashboard-filters-select {
+  @apply p-2 border rounded text-black;
+}
+/* UserCard */
+.user-card {
+  @apply bg-white p-5 rounded-xl shadow-sm border space-y-6;
+}
+
+.user-card-title {
+  @apply text-lg font-semibold text-gray-800 mb-3;
+}
+
+.user-card-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 text-sm;
+}
+
+.user-card-label {
+  @apply text-gray-500;
+}
+
+.user-card-value {
+  @apply font-medium text-gray-800;
+}
+/* Login Page */
+.login-page {
+  @apply min-h-screen flex items-center justify-center bg-blue-600;
+}
+
+.login-box {
+  @apply bg-white p-8 rounded-2xl shadow-lg w-80 text-black;
+}
+
+.login-title {
+  @apply text-2xl font-bold mb-6 text-center;
+}
+
+.login-input {
+  @apply w-full border p-2 mb-3 rounded;
+}
+
+.login-input-password {
+  @apply w-full border p-2 mb-5 rounded;
+}
+
+.login-button {
+  @apply w-full bg-blue-600 text-white py-2 rounded;
+}
+
+.login-message {
+  @apply mt-4 text-center text-sm text-red-600;
+}
+/* globals.css */
+
+/* Página completa */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2563eb; /* azul */
+}
+
+/* Card central */
+.register-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: black;
+}
+
+/* Título */
+.register-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Formulario */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.register-form input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+/* Botones */
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: #1e40af;
+}
+
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: #111827;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+/* Mensajes */
+.form-message {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #374151;
 }
